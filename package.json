@@ -1,0 +1,19 @@
+{
+  "name": "emptystream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HollyGrahamPlank/emptystream.git"
+  },
+  "author": "",
+  "license": "BOBBO-NET Friendly MIT License",
+  "bugs": {
+    "url": "https://github.com/HollyGrahamPlank/emptystream/issues"
+  },
+  "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme"
+}
