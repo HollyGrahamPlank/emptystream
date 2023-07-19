@@ -83,7 +83,7 @@ const serverlessConfigPath = `${__dirname}../serverless.yml`;
 // A client to connect to our emulated DynamoDB instance.
 const fakeDBClient = new DynamoDB({
   accessKeyId: "fake-key",
-  endpoint: "http://localhost:8001",
+  endpoint: "http://localhost:30333",
   region: "local",
   secretAccessKey: "fake-secret",
 });

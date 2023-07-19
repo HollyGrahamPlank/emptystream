@@ -12,9 +12,9 @@
   "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
   "scripts": {
     "dev": "serverless offline",
-    "setup:dynamodb": "node tools/create-dynamodb-tables-locally.js",
-    "up": "docker compose up -d",
-    "down": "docker compose down",
+    "setup:dynamodb": "node dynamodb-local/create-tables.js",
+    "up": "docker compose -f dynamodb-local/docker-compose.yml up -d",
+    "down": "docker compose -f dynamodb-local/docker-compose.yml down",
     "test": "jest --config=jest.config.ts",
     "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
