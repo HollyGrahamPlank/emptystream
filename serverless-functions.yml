@@ -1,0 +1,10 @@
+#
+#   Example Endpoint
+#
+
+exampleEndpoint:
+  handler: src/handlers/example.handler
+  events:
+    - httpApi:
+        path: /example
+        method: get

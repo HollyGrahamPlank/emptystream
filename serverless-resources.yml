@@ -1,0 +1,10 @@
+Resources:
+
+  #
+  #   Buckets
+  #
+
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:provider.environment.S3_BUCKET_EXAMPLE}
