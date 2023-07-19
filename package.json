@@ -16,7 +16,7 @@
     "up": "docker compose up -d",
     "down": "docker compose down",
     "test": "jest --config=jest.config.ts",
-    "lint": "eslint --ext .ts ./src",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
     "prune:dev": "serverless prune -n 3 --stage dev",
     "prune:prod": "serverless prune -n 3 --stage prod",
     "deploy:dev": "serverless deploy --stage dev",
