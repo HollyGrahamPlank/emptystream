@@ -1,10 +1,10 @@
 {
-    "compilerOptions": {
-        "strictNullChecks": true,
-        "module": "ES2022",
-        "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true,
-        "target": "ES2021",
-        "lib": ["ES2021"],
-    }
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "lib": ["ES2021"]
+  }
 }
