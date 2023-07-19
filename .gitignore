@@ -7,6 +7,12 @@ buckets/
 buckets/**/*
 
 #
+#   VSCode Ignore
+#
+
+.vscode/
+
+#
 #   TypeScript Ignore
 #
 
