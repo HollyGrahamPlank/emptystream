@@ -3,7 +3,7 @@ import {
   APIGatewayProxyHandler,
   APIGatewayProxyResult,
   Context,
-} from 'aws-lambda';
+} from "aws-lambda";
 
 /**
  * Validation for this handler function.
@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: 'Hello World!',
+      message: "Hello World!",
     }),
   };
 };
