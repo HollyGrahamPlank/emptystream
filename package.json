@@ -1,6 +1,15 @@
 {
   "name": "emptystream",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HollyGrahamPlank/emptystream.git"
+  },
+  "license": "BOBBO-NET Friendly MIT License",
+  "bugs": {
+    "url": "https://github.com/HollyGrahamPlank/emptystream/issues"
+  },
+  "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
   "scripts": {
     "dev": "serverless offline",
     "setup:dynamodb": "node tools/create-dynamodb-tables-locally.js",
@@ -12,15 +21,6 @@
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/HollyGrahamPlank/emptystream.git"
-  },
-  "license": "BOBBO-NET Friendly MIT License",
-  "bugs": {
-    "url": "https://github.com/HollyGrahamPlank/emptystream/issues"
-  },
-  "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
   "devDependencies": {
     "jest": "^29.6.1",
     "serverless-offline": "^12.0.4",
