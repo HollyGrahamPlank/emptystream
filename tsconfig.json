@@ -1,7 +1,10 @@
 {
     "compilerOptions": {
         "strictNullChecks": true,
-        "target": "ES5",
-        "outDir": ".build"
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "target": "ES2021",
+        "lib": ["ES2021"],
     }
 }

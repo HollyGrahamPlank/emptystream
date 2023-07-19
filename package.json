@@ -1,5 +1,6 @@
 {
   "name": "emptystream",
+  "type": "module",
   "scripts": {
     "dev": "serverless offline",
     "setup:dynamodb": "node tools/create-dynamodb-tables-locally.js",
