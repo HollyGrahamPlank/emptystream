@@ -1,19 +1,36 @@
 {
   "name": "emptystream",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "serverless offline",
+    "setup:dynamodb": "node tools/create-dynamodb-tables-locally.js",
+    "up": "docker compose up -d",
+    "down": "docker compose down",
+    "test": "jest --config=jest.config.ts",
+    "prune:dev": "serverless prune -n 3 --stage dev",
+    "prune:prod": "serverless prune -n 3 --stage prod",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HollyGrahamPlank/emptystream.git"
   },
-  "author": "",
   "license": "BOBBO-NET Friendly MIT License",
   "bugs": {
     "url": "https://github.com/HollyGrahamPlank/emptystream/issues"
   },
-  "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme"
+  "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
+  "devDependencies": {
+    "jest": "^29.6.1",
+    "serverless-offline": "^12.0.4",
+    "serverless-plugin-typescript": "^2.1.5",
+    "serverless-prune-plugin": "^2.0.2",
+    "serverless-s3-local": "^0.7.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.32.0",
+    "@types/aws-lambda": "^8.10.119"
+  }
 }
