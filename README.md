@@ -1,6 +1,5 @@
 # emptystream
-<p align="center"><img src="docs/images/logo.png" height="48">
-</p>
+<p align="center"><img src="docs/images/logo.png" height="256"></p>
 
 
 > Who would I be to describe myself as a part-time nocturnal Flâneur if I didn’t use my observations and reflections to create an art piece?
