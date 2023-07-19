@@ -7,22 +7,18 @@ import {
 
 /**
  * Validation for this handler function.
+ *
  * @param event The AWS Event information for this event
  * @param context The AWS Lambda execution context for this event
- * @returns relevant info once the handler passes verification.
+ * @returns Relevant info once the handler passes verification.
  */
-async function handlerValidation(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  event: APIGatewayProxyEvent,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  context: Context,
-) {
+async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
   // ...do nothing
 }
 
 export const handler: APIGatewayProxyHandler = async (
-  event,
-  context,
+  event: APIGatewayProxyEvent,
+  context: Context,
 ): Promise<APIGatewayProxyResult> => {
   handlerValidation(event, context);
 

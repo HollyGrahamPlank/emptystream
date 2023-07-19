@@ -2,5 +2,7 @@
   "semi": true,
   "singleQuote": false,
   "arrowParens": "always",
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "plugins": ["prettier-plugin-jsdoc"],
+  "printWidth": 100
 }
