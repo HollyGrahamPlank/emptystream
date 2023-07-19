@@ -3,7 +3,7 @@ import {
   APIGatewayProxyHandler,
   APIGatewayProxyResult,
   Context,
-} from 'aws-lambda';
+} from "aws-lambda";
 
 /**
  * Validation for this handler function.
