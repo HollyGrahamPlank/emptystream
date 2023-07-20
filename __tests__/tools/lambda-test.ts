@@ -7,6 +7,10 @@ import {
 } from "aws-lambda";
 import { v4 as uuidV4 } from "uuid";
 
+/**
+ * A class for helping with running unit tests on AWS Lambdas. The main purpose of this is to act as
+ * a wrapper around lambdas, so that they can be run like an async function.
+ */
 export default class LambdaTest {
   //
   //    Public Methods
@@ -18,6 +22,17 @@ export default class LambdaTest {
    * and populating the context object.
    *
    * This is meant to be used with Unit Tests, in order to make testing easier!
+   *
+   * @example
+   *   // Imagine that `someHandlerFunction` is some AWS Lambda Handler that says "Hello X!" where
+   *   // x is the value of a query string named "nameToGreet" passed in to the route.
+   *
+   *   // Run the `someHandlerFunction` lambda as if it was an async method const result = await
+   *   LambdaTest.run(someHandlerFunction, { queryStringParameters: { nameToGreet: "Holly" } });
+   *
+   *   // Parse the results and print 'em out. It should print "Hello Holly!" const { message } =
+   *   JSON.parse(result.body);
+   *   console.log(message);
    *
    * @param lambdaHandler The function exported by the lambda handler (usually named `handler`)
    * @param event Any additional event info, like params or headers.
