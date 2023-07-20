@@ -11,6 +11,7 @@ buckets/**/*
 #
 
 .vscode/
+!.vscode/extensions.json
 
 #
 #   TypeScript Ignore
