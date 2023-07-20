@@ -1,3 +1,19 @@
+/**
+ * Originally written by Marco Luthy for "Using DynamoDB Locally in a Serverless Framework Project"
+ * this file has been ported to TypeScript and re-written by Holly Plank.
+ *
+ * This script uses part of the project's Serverless Framework config to connect to a locally-hosted
+ * DynamoDB instance. Once connected, it will go through all DynamoDB Tables defined in the config
+ * and attempt to create them in the local DynamoDB instance if they do not already exist.
+ *
+ * This file should be executed using ts-node from the project ROOT - otherwise it will not be able
+ * to locate the serverless-resources.yml.
+ *
+ * @todo Use CLI args to determine the path to `serverless-resources.yml`.
+ *
+ * @todo Use CLI args to determine the connection details to DynamoDB local.
+ */
+
 import { promises as fs } from "fs";
 import { DynamoDBClient, ListTablesCommand, CreateTableCommand } from "@aws-sdk/client-dynamodb";
 import * as yaml from "js-yaml";
