@@ -10,7 +10,7 @@ buckets/**/*
 #   VSCode Ignore
 #
 
-.vscode/
+.vscode/**/*
 !.vscode/extensions.json
 
 #
