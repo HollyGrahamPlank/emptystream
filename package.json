@@ -12,7 +12,7 @@
   "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
   "scripts": {
     "dev": "serverless offline",
-    "setup:dynamodb": "node dynamodb-local/create-tables.js",
+    "setup:dynamodb": "ts-node-esm dynamodb-local/create-tables.ts",
     "up": "docker compose -f dynamodb-local/docker-compose.yml up -d",
     "down": "docker compose -f dynamodb-local/docker-compose.yml down",
     "test": "jest --config=jest.config.ts",
@@ -48,10 +48,10 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.370.0",
     "@aws-sdk/client-s3": "^3.32.0",
     "@serverless/utils": "^6.13.1",
     "@types/aws-lambda": "^8.10.119",
-    "aws-sdk": "^2.1418.0",
     "js-yaml": "^4.1.0"
   }
 }
