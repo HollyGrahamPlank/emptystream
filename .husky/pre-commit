@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Before comitting, run the lint-staged command. This executes Prettier and ESLint
+# on all .js and .ts files. You can see the config for this in ``.lintstagedrc.json``.
+npx lint-staged
