@@ -5,6 +5,18 @@ import {
   Context,
 } from "aws-lambda";
 
+import Joi from "joi";
+import handleApiException from "../../../handleApiException.js";
+import validateSchema from "../../../validation/validateSchema.js";
+
+interface IHandlerPathInput {
+  id: string;
+}
+
+const SchemaHandlerPathInput = Joi.object<IHandlerPathInput, true>({
+  id: Joi.string(),
+});
+
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
   /** The message to return. In this example, it's always "Hello World!" */
@@ -19,11 +31,12 @@ interface IHandlerOutput {
  * @returns Relevant info once the handler passes verification.
  */
 async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
-  // ...do nothing
+  const { id } = await validateSchema(SchemaHandlerPathInput, event.pathParameters);
+  return { id };
 }
 
 /**
- * An example Lambda Handler. Simply returns "Hello World!" as json.
+ * A lambda handler that gets the requested transmission, by it's ID
  *
  * @param event Info about the API Gateway event that triggered this lambda.
  * @param context Context regarding this lambda call
@@ -33,13 +46,17 @@ export const handler: APIGatewayProxyHandler = async (
   event: APIGatewayProxyEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
-  handlerValidation(event, context);
+  try {
+    const { id } = await handlerValidation(event, context);
 
-  const response: IHandlerOutput = { message: "Hello World!" };
-  return {
-    statusCode: 200,
-    body: JSON.stringify(response),
-  };
+    const response: IHandlerOutput = { message: `Got ID ${id}` };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(response),
+    };
+  } catch (exception) {
+    return handleApiException(exception);
+  }
 };
 
 export default handler;
