@@ -9,6 +9,10 @@ import Joi from "joi";
 import handleApiException from "../../../handleApiException.js";
 import validateSchema from "../../../validation/validateSchema.js";
 
+//
+//  Interfaces
+//
+
 interface IHandlerPathInput {
   id: string;
 }
@@ -22,6 +26,10 @@ interface IHandlerOutput {
   /** The message to return. In this example, it's always "Hello World!" */
   message: string;
 }
+
+//
+//  Handler
+//
 
 /**
  * Validation for this handler function.
