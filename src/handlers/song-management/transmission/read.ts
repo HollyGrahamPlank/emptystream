@@ -14,7 +14,7 @@ interface IHandlerPathInput {
 }
 
 const SchemaHandlerPathInput = Joi.object<IHandlerPathInput, true>({
-  id: Joi.string(),
+  id: Joi.string().required(),
 });
 
 /** How the JSON that the handler returns should be formatted. */
