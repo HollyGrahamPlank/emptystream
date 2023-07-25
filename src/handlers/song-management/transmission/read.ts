@@ -5,7 +5,7 @@ import {
   Context,
 } from "aws-lambda";
 
-import Joi from "joi";
+import { z } from "zod";
 import handleApiException from "../../../handleApiException.js";
 import validateSchema from "../../../validation/validateSchema.js";
 
@@ -13,13 +13,10 @@ import validateSchema from "../../../validation/validateSchema.js";
 //  Interfaces
 //
 
-interface IHandlerPathInput {
-  id: string;
-}
-
-const SchemaHandlerPathInput = Joi.object<IHandlerPathInput, true>({
-  id: Joi.string().required(),
+const SchemaHandlerPathInput = z.object({
+  id: z.string(),
 });
+type ISchemaHandlerPathInput = z.infer<typeof SchemaHandlerPathInput>;
 
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
