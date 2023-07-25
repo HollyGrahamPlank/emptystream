@@ -31,7 +31,7 @@ transmissionRead:
   handler: src/handlers/song-management/transmission/read.handler
   events:
     - httpApi:
-        path: /transmission/{idd}
+        path: /transmission/{id}
         method: get
 
 transmissionUpdate:
