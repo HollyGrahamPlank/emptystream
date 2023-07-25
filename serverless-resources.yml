@@ -7,3 +7,41 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: ${self:provider.environment.S3_BUCKET_EXAMPLE}
+
+  #
+  #   DynamoDB Tables
+  #
+
+  TableTransmissions:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:provider.environment.DYNAMODB_TABLE_NAME_TRANSMISSIONS}
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          KeyType: S
+        - AttributeName: sk
+          KeyType: S
+        - AttributeName: pk_gsi1
+          KeyType: S
+        - AttributeName: sk_gsi1
+          KeyType: S
+      GlobalSecondaryIndexes:
+        - IndexName: pk_gsi1-sk_gsi1-index
+          KeySchema:
+            - AttributeName: pk_gsi1
+              KeyType: HASH
+            - AttributeName: sk_gsi1
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
