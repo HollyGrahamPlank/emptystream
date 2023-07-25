@@ -3,7 +3,7 @@
   "singleQuote": false,
   "arrowParens": "always",
   "trailingComma": "all",
-  "endOfLine": "crlf",
   "plugins": ["prettier-plugin-jsdoc"],
   "printWidth": 100
 }
+

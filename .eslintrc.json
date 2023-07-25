@@ -10,7 +10,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "linebreak-style": ["error", "windows"],
+    "linebreak-style": "off",
     "prettier/prettier": "error",
     "max-len": ["error", { "code": 100 }],
     "no-console": "off",
