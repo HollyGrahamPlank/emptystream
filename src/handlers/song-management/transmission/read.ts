@@ -16,7 +16,6 @@ import validateSchema from "../../../validation/validateSchema.js";
 const SchemaHandlerPathInput = z.object({
   id: z.string(),
 });
-type ISchemaHandlerPathInput = z.infer<typeof SchemaHandlerPathInput>;
 
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
