@@ -13,7 +13,9 @@ import validateSchema from "../../../validation/validateSchema.js";
 //  Interfaces
 //
 
+/** The schema for the parameters that are passed into the handler via the HTTP path. */
 const SchemaHandlerPathInput = z.object({
+  /** The ID of the Transmission to get. */
   id: z.string(),
 });
 
