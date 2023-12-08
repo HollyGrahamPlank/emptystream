@@ -6,7 +6,7 @@ Resources:
   BucketExample:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ${self:provider.environment.S3_BUCKET_EXAMPLE}
+      BucketName: ${sls:stage}-example-bucket
 
   #
   #   DynamoDB Tables
@@ -15,7 +15,7 @@ Resources:
   TableTransmissions:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: ${self:provider.environment.DYNAMODB_TABLE_NAME_TRANSMISSIONS}
+      TableName: ${sls:stage}-${self:service}-transmissions
       KeySchema:
         - AttributeName: pk
           KeyType: HASH
@@ -23,13 +23,13 @@ Resources:
           KeyType: RANGE
       AttributeDefinitions:
         - AttributeName: pk
-          KeyType: S
+          AttributeType: S
         - AttributeName: sk
-          KeyType: S
+          AttributeType: S
         - AttributeName: pk_gsi1
-          KeyType: S
+          AttributeType: S
         - AttributeName: sk_gsi1
-          KeyType: S
+          AttributeType: S
       GlobalSecondaryIndexes:
         - IndexName: pk_gsi1-sk_gsi1-index
           KeySchema:

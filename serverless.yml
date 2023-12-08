@@ -19,8 +19,6 @@ provider:
   deploymentMethod: direct
   environment:
     SLS_STAGE: ${sls:stage}
-    S3_BUCKET_EXAMPLE: ${sls:stage}-example-bucket
-    DYNAMODB_TABLE_NAME_TRANSMISSIONS: ${sls:stage}-${self:service}-transmissions
 
 functions: ${file(serverless-functions.yml)}
 
