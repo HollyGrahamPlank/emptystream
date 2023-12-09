@@ -80,6 +80,7 @@ async function createLocalDynamoDBTables(
       if (existingTables.find((table) => table === TableName)) return;
 
       // OTHERWISE... create a new emulated table based on it's definition.
+      console.info(`${logicalId}: DynamoDB Local - Creating: ${TableName} ...`);
       const createCommand = new CreateTableCommand({
         AttributeDefinitions,
         BillingMode,
@@ -105,13 +106,17 @@ const resourcesPath = `${process.cwd()}\\serverless-resources.yml`;
 
 // A client to connect to our emulated DynamoDB instance.
 const fakeDBClient = new DynamoDBClient({
+  region: "local",
+  credentials: {
+    accessKeyId: "XXXXXXXXXXXXXXX",
+    secretAccessKey: "XXXXXXXXXXXXXXXXXXXXXX",
+  },
   endpoint: {
     hostname: "localhost",
     port: 30333,
     path: "",
     protocol: "http:",
   },
-  region: "local",
 });
 
 // Create the local DynamoDB tables!
