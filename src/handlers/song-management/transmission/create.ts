@@ -4,12 +4,20 @@ import {
   APIGatewayProxyResult,
   Context,
 } from "aws-lambda";
+import { z } from "zod";
 import handleApiException from "../../../handleApiException.js";
 import { parseMultipart } from "../../../parseMultipart.js";
+import validateMultipartSchema from "../../../validation/validateMultipartSchema.js";
 
 //
 //  Interfaces
 //
+
+/** The schema for the parameters that are passed into the handler via multipart data in the body */
+const SchemaHandlerMultipartInput = z.object({
+  Test: z.string(),
+  tester: z.instanceof(Buffer),
+});
 
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
@@ -30,7 +38,10 @@ interface IHandlerOutput {
  */
 async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
   // ...do nothing
-  const parsedData = await parseMultipart(event, { filesToParse: ["tester"] });
+  const parsedData = await validateMultipartSchema(SchemaHandlerMultipartInput, event, {
+    filesToParse: ["tester"],
+  });
+
   console.log(parsedData);
 }
 

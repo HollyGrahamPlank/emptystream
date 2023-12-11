@@ -39,53 +39,13 @@ const parseMultipartConfigDefaults: IParseMultipartConfig = {
   maxFieldSize: Infinity,
 };
 
-/** A single parsed NON-FILE field from the given multipart data. */
-export interface IParsedMultipartField {
-  /** The name of this field. */
-  name: string;
-
-  /** The value of this field as a string. May need to be cast. */
-  value: string;
-
-  /** The raw info about this field. This contains things like encoding and mimeType. */
-  info: busboy.FieldInfo;
-}
-
-/** A single parsed FILE field from the given multipart data. */
-export interface IParsedMultipartFile {
-  /**
-   * The name of this field. NOT the file-name - specifically the name of the field that this file
-   * is contained in.
-   */
-  name: string;
-
-  /** The file itself, stored inside a buffer. */
-  fileBuffer: Buffer;
-
-  /**
-   * The raw info about this field. This contains things like the original filename, encoding, and
-   * mimeType.
-   */
-  info: busboy.FileInfo;
-}
-
-/** All of the parsed data from the given multipart data, formatted in a digestible way. */
+/** All of the parsed data from the given multipart data, formatted as a basic JSON object. */
 export interface IParsedMultipart {
   /**
-   * All fields found in the given multipart data.
-   *
-   * The key is the name of a non-file field, and it's value is parsed info about the field itself.
+   * Each parsed file and non-file field. If this is a non-file, it'll be a string. If it's a file,
+   * it'll be the file buffer.
    */
-  fields: Map<string, IParsedMultipartField>;
-
-  /**
-   * All files found in the given multipart data that have a field name matching a value in
-   * `IParseMultipartConfig.filesToParse`.
-   *
-   * The key is the name of the file field, and it's value is parsed info about the file field
-   * itself (INCLUDING the buffered file).
-   */
-  files: Map<string, IParsedMultipartFile>;
+  [fieldName: string]: string | Buffer | undefined;
 }
 
 //
@@ -113,10 +73,7 @@ export async function parseMultipart(
       const config: IParseMultipartConfig = { ...parseMultipartConfigDefaults, ...inputConfig };
 
       // Create a structure to store and return the parsed fields and files.
-      const parsedData: IParsedMultipart = {
-        fields: new Map<string, IParsedMultipartField>(),
-        files: new Map<string, IParsedMultipartFile>(),
-      };
+      const parsedData: IParsedMultipart = {};
 
       // Construct the stream that will parse the multipart data from the AWS lambda.
       const multipartStream = busboy({
@@ -125,16 +82,12 @@ export async function parseMultipart(
       });
 
       // Define how to handle fields in the multipart data
-      multipartStream.on("field", (name, value, info) => {
-        parsedData.fields.set(name, {
-          name,
-          value,
-          info,
-        });
+      multipartStream.on("field", (name, value) => {
+        parsedData[name] = value;
       });
 
       // Define how to handle files in the multipart data
-      multipartStream.on("file", (name, stream, info) => {
+      multipartStream.on("file", (name, stream) => {
         // If this is NOT a file we're listening for, IGNORE THIS
         if (!config.filesToParse.includes(name)) return;
 
@@ -149,11 +102,7 @@ export async function parseMultipart(
         // Once there are no more file chunks, join them all together
         // into a buffer and store them in our return result.
         stream.on("end", () => {
-          parsedData.files.set(name, {
-            name,
-            fileBuffer: Buffer.concat(streamDataChunks),
-            info,
-          });
+          parsedData[name] = Buffer.concat(streamDataChunks);
         });
       });
 
