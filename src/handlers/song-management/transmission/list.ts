@@ -5,11 +5,34 @@ import {
   Context,
 } from "aws-lambda";
 
+import { z } from "zod";
+import handleApiException from "../../../handleApiException.js";
+import validateSchema from "../../../validation/validateSchema.js";
+import Transmission from "../../../db/entities/Transmission.js";
+
+//
+//  Interfaces
+//
+
+/** The schema for the parameters that are passed into the handler via the query string. */
+const SchemaHandlerQueryInput = z.object({
+  /** If we are paginating results - this is the ID where we last left off. */
+  lastEvaluatedId: z.string().optional(),
+});
+
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
-  /** The message to return. In this example, it's always "Hello World!" */
-  message: string;
+  lastEvaluatedId?: string;
+  itemCount: number;
+  items: {
+    id: string;
+    name: string;
+  }[];
 }
+
+//
+//  Handler
+//
 
 /**
  * Validation for this handler function.
@@ -19,7 +42,12 @@ interface IHandlerOutput {
  * @returns Relevant info once the handler passes verification.
  */
 async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
-  // ...do nothing
+  const { lastEvaluatedId } = await validateSchema(
+    SchemaHandlerQueryInput,
+    event.queryStringParameters,
+  );
+
+  return { lastEvaluatedId };
 }
 
 /**
@@ -33,13 +61,23 @@ export const handler: APIGatewayProxyHandler = async (
   event: APIGatewayProxyEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
-  handlerValidation(event, context);
+  try {
+    const { lastEvaluatedId } = await handlerValidation(event, context);
 
-  const response: IHandlerOutput = { message: "Hello World!" };
-  return {
-    statusCode: 200,
-    body: JSON.stringify(response),
-  };
+    const results = await Transmission.scan.go({ cursor: lastEvaluatedId });
+
+    const response: IHandlerOutput = {
+      lastEvaluatedId: results.cursor || undefined,
+      itemCount: results.data.length,
+      items: results.data.map((value) => ({ name: value.name, id: value.id })),
+    };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(response),
+    };
+  } catch (exception) {
+    return handleApiException(exception);
+  }
 };
 
 export default handler;
