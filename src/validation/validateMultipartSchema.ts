@@ -29,8 +29,6 @@ export default async function validateMultipartSchema<T, TSchema extends z.ZodTy
 
     return result;
   } catch (err) {
-    console.log(err);
-
     if (err instanceof z.ZodError) {
       // If there was an error during the Zod validation... handle it.
       throw new ApiError(409, "Failed to validate data");

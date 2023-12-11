@@ -6,7 +6,6 @@ import {
 } from "aws-lambda";
 import { z } from "zod";
 import handleApiException from "../../../handleApiException.js";
-import { parseMultipart } from "../../../multipart/parseMultipart.js";
 import validateMultipartSchema from "../../../validation/validateMultipartSchema.js";
 
 //
@@ -15,8 +14,11 @@ import validateMultipartSchema from "../../../validation/validateMultipartSchema
 
 /** The schema for the parameters that are passed into the handler via multipart data in the body */
 const SchemaHandlerMultipartInput = z.object({
-  Test: z.string(),
-  tester: z.instanceof(Buffer),
+  /** The name of the new Transmission. */
+  name: z.string(),
+
+  /** The audio file of the Transmission. */
+  audio: z.instanceof(Buffer),
 });
 
 /** How the JSON that the handler returns should be formatted. */
@@ -37,13 +39,12 @@ interface IHandlerOutput {
  * @returns Relevant info once the handler passes verification.
  */
 async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
-  // ...do nothing
-  const parsedData = await validateMultipartSchema(SchemaHandlerMultipartInput, event, {
-    filesToParse: ["tester"],
+  const { name, audio } = await validateMultipartSchema(SchemaHandlerMultipartInput, event, {
+    filesToParse: ["audio"],
     maxFileSize: 1048576 * 3, // 3 MB
   });
 
-  console.log(parsedData);
+  return { name, audio };
 }
 
 /**
@@ -58,9 +59,13 @@ export const handler: APIGatewayProxyHandler = async (
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    await handlerValidation(event, context);
+    const { name, audio } = await handlerValidation(event, context);
 
-    const response: IHandlerOutput = { message: "Hello World!" };
+    const response: IHandlerOutput = {
+      message:
+        `So.. you want to create a transmission named ${name}` +
+        ` that is ${audio.byteLength} bytes long?`,
+    };
     return {
       statusCode: 200,
       body: JSON.stringify(response),
