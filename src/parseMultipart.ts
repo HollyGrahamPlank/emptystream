@@ -138,13 +138,22 @@ export async function parseMultipart(
         // If this is NOT a file we're listening for, IGNORE THIS
         if (!config.filesToParse.includes(name)) return;
 
-        // if this IS a file we're listening for, read it all into a buffer and save it
-        // for our output.
-        parsedData.files.set(name, {
-          name,
-          // TODO - for some reason this read method is returning null. FIX THIS!
-          fileBuffer: stream.read(),
-          info,
+        // Create a place to store streamed chunks of data
+        const streamDataChunks: any[] = [];
+
+        // Whenever chunks of this file come in, store them in the above array
+        stream.on("data", (chunk) => {
+          streamDataChunks.push(chunk);
+        });
+
+        // Once there are no more file chunks, join them all together
+        // into a buffer and store them in our return result.
+        stream.on("end", () => {
+          parsedData.files.set(name, {
+            name,
+            fileBuffer: Buffer.concat(streamDataChunks),
+            info,
+          });
         });
       });
 
