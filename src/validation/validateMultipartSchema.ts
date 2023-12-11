@@ -1,7 +1,8 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { z } from "zod";
 import ApiError from "../apiError.js";
-import { IParseMultipartConfig, parseMultipart } from "../parseMultipart.js";
+import { IParseMultipartConfig, parseMultipart } from "../multipart/parseMultipart.js";
+import ParseMultipartError from "../multipart/parseMultipartError.js";
 
 /**
  * Given some Zod schema and multipart parsing data, parse a lambda event's multipart data and
@@ -28,9 +29,14 @@ export default async function validateMultipartSchema<T, TSchema extends z.ZodTy
 
     return result;
   } catch (err) {
+    console.log(err);
+
     if (err instanceof z.ZodError) {
       // If there was an error during the Zod validation... handle it.
       throw new ApiError(409, "Failed to validate data");
+    } else if (err instanceof ParseMultipartError) {
+      // If there was an error during the multipart parsing... handle it.
+      throw new ApiError(409, err.message);
     } else {
       // If we don't know WHAT the issue was... handle it.
       console.log(err);

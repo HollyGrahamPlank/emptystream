@@ -6,7 +6,7 @@ import {
 } from "aws-lambda";
 import { z } from "zod";
 import handleApiException from "../../../handleApiException.js";
-import { parseMultipart } from "../../../parseMultipart.js";
+import { parseMultipart } from "../../../multipart/parseMultipart.js";
 import validateMultipartSchema from "../../../validation/validateMultipartSchema.js";
 
 //
@@ -40,6 +40,7 @@ async function handlerValidation(event: APIGatewayProxyEvent, context: Context) 
   // ...do nothing
   const parsedData = await validateMultipartSchema(SchemaHandlerMultipartInput, event, {
     filesToParse: ["tester"],
+    maxFileSize: 1048576 * 3, // 3 MB
   });
 
   console.log(parsedData);
