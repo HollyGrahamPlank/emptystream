@@ -4,12 +4,22 @@ import {
   APIGatewayProxyResult,
   Context,
 } from "aws-lambda";
+import handleApiException from "../../../handleApiException.js";
+import { parseMultipart } from "../../../parseMultipart.js";
+
+//
+//  Interfaces
+//
 
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
   /** The message to return. In this example, it's always "Hello World!" */
   message: string;
 }
+
+//
+//  Handler
+//
 
 /**
  * Validation for this handler function.
@@ -20,6 +30,8 @@ interface IHandlerOutput {
  */
 async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
   // ...do nothing
+  const parsedData = await parseMultipart(event, { filesToParse: ["tester"] });
+  console.log(parsedData);
 }
 
 /**
@@ -33,13 +45,17 @@ export const handler: APIGatewayProxyHandler = async (
   event: APIGatewayProxyEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
-  handlerValidation(event, context);
+  try {
+    await handlerValidation(event, context);
 
-  const response: IHandlerOutput = { message: "Hello World!" };
-  return {
-    statusCode: 200,
-    body: JSON.stringify(response),
-  };
+    const response: IHandlerOutput = { message: "Hello World!" };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(response),
+    };
+  } catch (exception) {
+    return handleApiException(exception);
+  }
 };
 
 export default handler;
