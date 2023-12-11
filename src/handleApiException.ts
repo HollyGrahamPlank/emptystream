@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from "aws-lambda";
-import ApiError from "./apiError.js";
+import ApiError from "./apiErrors/apiError.js";
 
 /**
  * Takes an exception and generates a public-facing result for a lambda handler to return. This

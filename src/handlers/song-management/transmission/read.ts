@@ -8,6 +8,8 @@ import {
 import { z } from "zod";
 import handleApiException from "../../../handleApiException.js";
 import validateSchema from "../../../validation/validateSchema.js";
+import Transmission from "../../../db/entities/Transmission.js";
+import NotFoundApiError from "../../../apiErrors/notFoundApiError.js";
 
 //
 //  Interfaces
@@ -21,8 +23,8 @@ const SchemaHandlerPathInput = z.object({
 
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
-  /** The message to return. In this example, it's always "Hello World!" */
-  message: string;
+  id: string;
+  name: string;
 }
 
 //
@@ -55,7 +57,11 @@ export const handler: APIGatewayProxyHandler = async (
   try {
     const { id } = await handlerValidation(event, context);
 
-    const response: IHandlerOutput = { message: `Got ID ${id}` };
+    // Get the item, and throw if we can't
+    const item = await Transmission.get({ id }).go();
+    if (!item.data) throw new NotFoundApiError();
+
+    const response: IHandlerOutput = { id: item.data.id, name: item.data.name };
     return {
       statusCode: 200,
       body: JSON.stringify(response),

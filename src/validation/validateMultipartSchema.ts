@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { z } from "zod";
-import ApiError from "../apiError.js";
+import ApiError from "../apiErrors/apiError.js";
 import { IParseMultipartConfig, parseMultipart } from "../multipart/parseMultipart.js";
 import ParseMultipartError from "../multipart/parseMultipartError.js";
 

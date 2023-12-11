@@ -12,10 +12,10 @@ Resources:
   #   DynamoDB Tables
   #
 
-  TableTransmissions:
+  TableMain:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: ${sls:stage}-${self:service}-transmissions
+      TableName: ${sls:stage}-${self:service}-mainTable
       KeySchema:
         - AttributeName: pk
           KeyType: HASH

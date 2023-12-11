@@ -1,5 +1,5 @@
 import { z } from "zod";
-import ApiError from "../apiError.js";
+import ApiError from "../apiErrors/apiError.js";
 
 /**
  * Given some Zod schema and an object, validate it or throw a proper ApiError.
