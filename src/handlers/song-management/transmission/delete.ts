@@ -5,11 +5,24 @@ import {
   Context,
 } from "aws-lambda";
 
-/** How the JSON that the handler returns should be formatted. */
-interface IHandlerOutput {
-  /** The message to return. In this example, it's always "Hello World!" */
-  message: string;
-}
+import { z } from "zod";
+import handleApiException from "../../../handleApiException.js";
+import validateSchema from "../../../validation/validateSchema.js";
+import Transmission from "../../../db/entities/Transmission.js";
+
+//
+//  Interfaces
+//
+
+/** The schema for the parameters that are passed into the handler via the HTTP path. */
+const SchemaHandlerPathInput = z.object({
+  /** The ID of the Transmission to delete. */
+  id: z.string(),
+});
+
+//
+//  Handler
+//
 
 /**
  * Validation for this handler function.
@@ -19,7 +32,8 @@ interface IHandlerOutput {
  * @returns Relevant info once the handler passes verification.
  */
 async function handlerValidation(event: APIGatewayProxyEvent, context: Context) {
-  // ...do nothing
+  const { id } = await validateSchema(SchemaHandlerPathInput, event.pathParameters);
+  return { id };
 }
 
 /**
@@ -33,13 +47,19 @@ export const handler: APIGatewayProxyHandler = async (
   event: APIGatewayProxyEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
-  handlerValidation(event, context);
+  try {
+    const { id } = await handlerValidation(event, context);
 
-  const response: IHandlerOutput = { message: "Hello World!" };
-  return {
-    statusCode: 200,
-    body: JSON.stringify(response),
-  };
+    // Delete the item
+    await Transmission.delete({ id }).go();
+
+    return {
+      statusCode: 200,
+      body: "",
+    };
+  } catch (exception) {
+    return handleApiException(exception);
+  }
 };
 
 export default handler;
