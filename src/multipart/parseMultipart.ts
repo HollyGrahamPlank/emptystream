@@ -54,6 +54,12 @@ export interface IParsedMultipart {
 //  Functions
 //
 
+/**
+ * Given some busboy stream, await until the stream is closed.
+ *
+ * @param multipartStream The Busboy stream to wait on.
+ * @returns
+ */
 async function waitForStreamEnd(multipartStream: Busboy): Promise<Busboy> {
   return new Promise((resolve) => {
     multipartStream.on("close", () => {
@@ -62,18 +68,39 @@ async function waitForStreamEnd(multipartStream: Busboy): Promise<Busboy> {
   });
 }
 
-function setupParseFields(multipartStream: Busboy, whereToStoreFields: Map<string, string>) {
+/**
+ * Parses all non-file fields from some Busboy stream. Stream must be populated, or actively BEING
+ * populated for this, because this promise will only resolve when the busboy stream has closed.
+ *
+ * @param multipartStream The Busboy stream to parse non-file fields from.
+ * @returns A map of each field and it's value.
+ */
+async function parseFields(multipartStream: Busboy) {
+  const parsedFields = new Map<string, string>();
+
   // Whenever a field is encountered, store it in the above map
   multipartStream.on("field", (name, value) => {
-    whereToStoreFields.set(name, value);
+    parsedFields.set(name, value);
   });
+
+  // Wait until we've parsed all data, then return the parsed data!
+  await waitForStreamEnd(multipartStream);
+  return parsedFields;
 }
 
-function setupParseFiles(
-  multipartStream: Busboy,
-  filesToParse: string[],
-  whereToStoreFiles: Map<string, Buffer>,
-) {
+/**
+ * Parses some select file fields from some Busboy stream. Stream must be populated, or actively
+ * BEING populated for this, because this promise will only resolve when the busboy stream has
+ * closed.
+ *
+ * @param multipartStream The Busboy stream to parse file fields from.
+ * @param filesToParse When a file is encountered in the stream, it will be ignored if it's field
+ *   name is not in this list.
+ * @returns A map of each field and the buffered file it belongs to.
+ */
+async function parseFiles(multipartStream: Busboy, filesToParse: string[]) {
+  const parsedFiles = new Map<string, Buffer>();
+
   // Whenever a file is encountered, try to store it in the above map
   multipartStream.on("file", (name, stream) => {
     // If this is NOT a file we're listening for, IGNORE THIS
@@ -96,9 +123,13 @@ function setupParseFiles(
     // Once there are no more file chunks, join them all together
     // into a buffer and store them in our return result.
     stream.on("close", () => {
-      whereToStoreFiles.set(name, Buffer.concat(streamDataChunks));
+      parsedFiles.set(name, Buffer.concat(streamDataChunks));
     });
   });
+
+  // Wait until we've parsed all data, then return the parsed data!
+  await waitForStreamEnd(multipartStream);
+  return parsedFiles;
 }
 
 /**
@@ -125,19 +156,17 @@ export async function parseMultipart(
     limits: { fileSize: config.maxFileSize, fieldSize: config.maxFieldSize },
   });
 
-  // Tell our stream how to parse files and fields
-  const parsedFields = new Map<string, string>();
-  setupParseFields(multipartStream, parsedFields);
+  // Construct promises that will parse fields and files from busboy
+  const parseFieldsPromise = parseFields(multipartStream);
+  const parseFilesPromise = parseFiles(multipartStream, config.filesToParse);
 
-  const parsedFiles = new Map<string, Buffer>();
-  setupParseFiles(multipartStream, config.filesToParse, parsedFiles);
-
-  // Now the stream knows how to parse... parse!
+  // Before awaiting these promises, pump busboy full of data! We need data before the above
+  // funcs will work.
   multipartStream.write(event.body);
   multipartStream.destroy();
 
-  // Wait for the stream to finish parsing...
-  await waitForStreamEnd(multipartStream);
+  // Wait for the parsing to finish...
+  const [parsedFields, parsedFiles] = await Promise.all([parseFieldsPromise, parseFilesPromise]);
 
   // ...and once everything has been parsed - store it properly and exit!
   const parsedData: IParsedMultipart = {};
