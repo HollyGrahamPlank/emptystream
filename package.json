@@ -12,6 +12,7 @@
   "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
   "scripts": {
     "dev": "serverless offline",
+    "debug": "export SLS_DEBUG=* && node --inspect /usr/local/bin/serverless offline",
     "setup:dynamodb": "ts-node-esm dynamodb-local/create-tables.ts",
     "up": "docker compose -f dynamodb-local/docker-compose.yml up -d",
     "down": "docker compose -f dynamodb-local/docker-compose.yml down",
