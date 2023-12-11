@@ -7,6 +7,9 @@ import {
 import { z } from "zod";
 import handleApiException from "../../../handleApiException.js";
 import validateMultipartSchema from "../../../validation/validateMultipartSchema.js";
+import Transmission from "../../../entities/Transmission.js";
+import { nanoid } from "nanoid";
+import { EntityItem } from "electrodb";
 
 //
 //  Interfaces
@@ -23,8 +26,8 @@ const SchemaHandlerMultipartInput = z.object({
 
 /** How the JSON that the handler returns should be formatted. */
 interface IHandlerOutput {
-  /** The message to return. In this example, it's always "Hello World!" */
-  message: string;
+  id: string;
+  name: string;
 }
 
 //
@@ -59,13 +62,19 @@ export const handler: APIGatewayProxyHandler = async (
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const { name, audio } = await handlerValidation(event, context);
+    const { name } = await handlerValidation(event, context);
+
+    // Create a new transmission with a new ID, and the desired name
+    const item = await Transmission.create({
+      id: nanoid(),
+      name,
+    }).go();
 
     const response: IHandlerOutput = {
-      message:
-        `So.. you want to create a transmission named ${name}` +
-        ` that is ${audio.byteLength} bytes long?`,
+      id: item.data.id,
+      name: item.data.name,
     };
+
     return {
       statusCode: 200,
       body: JSON.stringify(response),

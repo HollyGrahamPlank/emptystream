@@ -19,6 +19,7 @@ provider:
   deploymentMethod: direct
   environment:
     SLS_STAGE: ${sls:stage}
+    SERVICE_NAME: ${self:service}
 
 functions: ${file(serverless-functions.yml)}
 
