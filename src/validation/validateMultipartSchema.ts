@@ -18,7 +18,7 @@ export default async function validateMultipartSchema<T, TSchema extends z.ZodTy
   schema: TSchema,
   event: APIGatewayProxyEvent,
   inputConfig: Partial<IParseMultipartConfig> = {},
-): Promise<T> {
+): Promise<z.infer<TSchema>> {
   try {
     // Parse the multipart data from the given lambda event
     const parsedResults = await parseMultipart(event, inputConfig);

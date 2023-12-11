@@ -11,7 +11,7 @@ import ApiError from "../apiError.js";
 export default async function validateSchema<T, TSchema extends z.ZodType<T>>(
   schema: TSchema,
   object: Partial<T> | null | undefined,
-): Promise<T> {
+): Promise<z.infer<TSchema>> {
   try {
     // Validate the input object. If the input object is valid, then we are done!
     const result = await schema.parseAsync(object || {});
