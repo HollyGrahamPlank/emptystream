@@ -15,6 +15,7 @@
  */
 
 import { promises as fs } from "fs";
+import * as path from "path";
 import {
   DynamoDBClient,
   ListTablesCommand,
@@ -140,7 +141,7 @@ async function createLocalDynamoDBTables(
 //
 
 // Where the serverless.yml file is store relative to this file.
-const resourcesPath = `${process.cwd()}\\serverless-resources.yml`;
+const resourcesPath = path.join(process.cwd(), "serverless-resources.yml");
 
 // A client to connect to our emulated DynamoDB instance.
 const fakeDBClient = new DynamoDBClient({
