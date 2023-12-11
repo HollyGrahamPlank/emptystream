@@ -7,6 +7,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: ${sls:stage}-example-bucket
+  BucketMain:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${sls:stage}-${self:service}-mainBucket
 
   #
   #   DynamoDB Tables
