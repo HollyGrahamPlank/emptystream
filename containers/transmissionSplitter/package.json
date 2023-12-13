@@ -1,0 +1,34 @@
+{
+  "name": "transmissionsplitter",
+  "type": "module",
+  "description": "An app that takes emptystream Transmissions and splits them into multiple channels using demucs",
+  "license": "BOBBO-NET Friendly MIT License",
+  "scripts": {
+    "start": "ts-node-esm src/main.ts",
+    "test": "jest --config=jest.config.ts",
+    "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "babel-jest": "^29.6.1",
+    "eslint": "^8.45.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-node": "^4.1.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.6.1",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.0",
+    "prettier-plugin-jsdoc": "^1.0.1",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {}
+}
