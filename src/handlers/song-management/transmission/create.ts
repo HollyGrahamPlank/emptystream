@@ -9,6 +9,7 @@ import { z } from "zod";
 import Transmission from "../../../db/entities/Transmission.js";
 import handleApiException from "../../../handleApiException.js";
 import validateMultipartSchema from "../../../validation/validateMultipartSchema.js";
+import TransmissionSource from "../../../s3/transmissionSource.js";
 
 //
 //  Interfaces
@@ -61,7 +62,7 @@ export const handler: APIGatewayProxyHandler = async (
   context: Context,
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const { name } = await handlerValidation(event, context);
+    const { name, audio } = await handlerValidation(event, context);
 
     // Create a new transmission with a new ID, and the desired name
     const item = await Transmission.create({
@@ -69,6 +70,11 @@ export const handler: APIGatewayProxyHandler = async (
       name,
     }).go();
 
+    // Store the source audio in S3
+    await TransmissionSource.upload(item.data.id, audio);
+    // TODO - what happens if the above fails?
+
+    // Format the data output
     const response: IHandlerOutput = {
       id: item.data.id,
       name: item.data.name,
