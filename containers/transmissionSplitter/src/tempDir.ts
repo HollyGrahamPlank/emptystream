@@ -1,0 +1,18 @@
+import { promises as fsPromise } from "fs";
+import * as path from "path";
+
+export async function ensurePathExists(path: string) {
+  await fsPromise.mkdir(path, { recursive: true });
+}
+
+export function getTempDirPath(transmissionId: string): string {
+  return path.join("tmp", transmissionId);
+}
+
+export function getSourceAudioDir(transmissionId: string): string {
+  return path.join(getTempDirPath(transmissionId), "source");
+}
+
+export function getSplitAudioDir(transmissionId: string): string {
+  return path.join(getTempDirPath(transmissionId), "split");
+}

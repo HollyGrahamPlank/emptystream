@@ -1,4 +1,7 @@
 import { spawn } from "child_process";
+import { ensurePathExists, getSourceAudioDir, getSplitAudioDir } from "./tempDir.js";
+import { promises as fsPromise } from "fs";
+import * as path from "path";
 
 //
 //  Functions
@@ -41,12 +44,41 @@ function runCommand(executablePath: string, args: string[], onDataCallback?: (ch
 //
 
 /**
- * Splits an audio file into 4 tracks using demucs, then stores it at `separated/htdemucs/{fileName}
+ * Splits an audio file into 4 tracks using demucs, then stores it in the temporary working
+ * directory.
  *
- * @param fileName The name of the audio file to split
+ * @param id The ID of the audio transmission to split. Expected to have already been loaded into
+ *   the temporary directory.
  */
-export default async function splitAudio(fileName: string) {
-  await runCommand("python", ["-u", "-m", "demucs", `"${fileName}"`], (chunk) => {
-    console.log(chunk);
-  });
+export default async function splitAudio(id: string) {
+  // Tell demucs to split our audio.
+  await runCommand(
+    "python",
+    ["-u", "-m", "demucs", `"${path.join(getSourceAudioDir(id), id)}"`],
+    (chunk) => {
+      console.log(chunk);
+    },
+  );
+
+  // Make sure we have a spot to store the split audio
+  const whereToPutSplitAudio = getSplitAudioDir(id);
+  await ensurePathExists(whereToPutSplitAudio);
+
+  // Where demucs spat out our split audio
+  const pathToCurrentSplitDir = path.join("split", "htdemucs", id);
+
+  // Loop through all stems that demucs spat out, in parallel...
+  const newStems: string[] = await fsPromise.readdir(pathToCurrentSplitDir);
+  await Promise.all(
+    newStems.map(async (stemName) => {
+      // ... and copy the stem to the temp working dir
+      await fsPromise.rename(
+        path.join(pathToCurrentSplitDir, stemName), // The old file path
+        path.join(whereToPutSplitAudio, stemName), // The new file path
+      );
+    }),
+  );
+
+  // Clean up the folder that demucs created
+  await fsPromise.rmdir(pathToCurrentSplitDir);
 }

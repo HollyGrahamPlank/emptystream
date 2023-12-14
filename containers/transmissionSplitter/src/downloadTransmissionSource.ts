@@ -1,7 +1,8 @@
-import { S3Client } from "@aws-sdk/client-s3";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import * as fs from "fs";
+import * as path from "path";
 import { Readable } from "stream";
+import { ensurePathExists, getSourceAudioDir } from "./tempDir.js";
 
 //
 //  Local Functions
@@ -52,15 +53,18 @@ function pipeBodyToFile(body: Readable | ReadableStream | Blob | undefined, file
 //
 
 /**
- * Downloads the desired emptystream Transmission source audio to a file on disk named "sourceAudio"
+ * Downloads the desired emptystream Transmission source audio to a file on disk.
  *
  * @param bucketName The name of the bucket that contains all Transmissions
  * @param id The ID of the Transmission to download the source audio for.
  */
 export default async function downloadTransmissionSource(bucketName: string, id: string) {
+  // Make sure that we have a tmp directory for this transmission
+  await ensurePathExists(getSourceAudioDir(id));
+
   // Start downloading the file from S3
   const { Body } = await getFileFromS3(bucketName, `transmissions/${id}/sourceAudio`);
 
   // Pipe the downloading file into a file on disk
-  await pipeBodyToFile(Body, "sourceAudio");
+  await pipeBodyToFile(Body, path.join(getSourceAudioDir(id), id));
 }
