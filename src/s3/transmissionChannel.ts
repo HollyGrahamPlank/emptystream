@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/client-s3";
 import getFullBucketName from "./getFullBucketName.js";
 import s3Client from "./s3Client.js";
+import { S3InputBodyType } from "./s3BodyTypes.js";
 
 const bucketName = getFullBucketName("mainBucket");
 
@@ -18,7 +19,7 @@ function translateKey(id: string, type: string): string {
 //
 
 namespace TransmissionChannel {
-  export function upload(id: string, type: string, file: Buffer) {
+  export function upload(id: string, type: string, file: S3InputBodyType) {
     return s3Client.send(
       new PutObjectCommand({
         Bucket: bucketName,
