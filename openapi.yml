@@ -1,0 +1,297 @@
+openapi: 3.0.0
+info:
+  description: |-
+    An API detailing the various routes controlling emptystream, a net art piece by Holly Plank. 
+
+    ![Image of cloud architecture](https://raw.githubusercontent.com/HollyGrahamPlank/emptystream/main/docs/images/cloud_design.svg)
+  version: "1.0.0"
+  contact:
+    email: hollygrahamplank@gmail.com
+    url: hollyplank.com
+    name: Holly Plank
+  license:
+    name: BOBBO-NET Friendly MIT License
+    url: https://github.com/HollyGrahamPlank/emptystream/blob/main/LICENSE.md
+  title: "`emptystream` API"
+tags:
+  - name: Song Management API
+    description: CRUD operations on emptystream songs.
+  - name: Content Stream API
+    description: The main radio. Commands what is playing.
+  - name: Admin Panel API
+    description: Exposes control to administrative functionality through the web.
+paths:
+  /transmission/{id}:
+    get:
+      tags:
+        - Song Management API
+      summary: Get Transmission by ID
+      description: Get a single Transmission using it's ID.
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the Transmission to get.
+          required: true
+          schema:
+            type: string
+            format: nanoId
+      responses:
+        "200":
+          description: The transmission matching the specified ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lastEvaulatedId:
+                    type: string
+                    format: nanoId
+                    example: fMW0PcHRJGUtUnadq4mvy
+                  itemCount:
+                    type: integer
+                    example: 1
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Transmission"
+        "400":
+          description: Missing input ID or malformed input ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "404":
+          description: No transmission with the specified ID found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+    patch:
+      tags:
+        - Song Management API
+      summary: Update Transmission by ID
+      description: Update a single Transmission using it's ID. Only name changes are permitted.
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the Transmission to update.
+          required: true
+          schema:
+            type: string
+            format: nanoId
+      requestBody:
+        description: Fields to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The new name of the Transmission.
+                  example: "whoisthere"
+      responses:
+        "200":
+          description: The newly updated Transmission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transmission"
+        "400":
+          description: Missing input ID or malformed request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "404":
+          description: No transmission with the specified ID found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+    delete:
+      tags:
+        - Song Management API
+      summary: Delete Transmission by ID
+      description: Delete a single Transmission by it's ID.
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the Transmission to delete.
+          required: true
+          schema:
+            type: string
+            format: nanoId
+      responses:
+        "200":
+          description: The transmission has been removed
+        "400":
+          description: Missing input ID or malformed input ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "404":
+          description: No transmission with the specified ID found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+  /transmission:
+    get:
+      description: Get a list of all Transmissions that exist.
+      summary: Get all Transmissions
+      tags:
+        - Song Management API
+      parameters:
+        - in: query
+          name: lastEvaluatedId
+          description: If paginating, the lastEvaluatedId of the previous request.
+          required: false
+          schema:
+            type: string
+            format: nanoId
+            example: fMW0PcHRJGUtUnadq4mvy
+      responses:
+        "200":
+          description: A list of Transmissions (starting from the provided lastEvaluatedId, if there was one).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lastEvaulatedId:
+                    type: string
+                    format: nanoId
+                    example: fMW0PcHRJGUtUnadq4mvy
+                  itemCount:
+                    type: integer
+                    example: 1
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Transmission"
+        "400":
+          description: Malformed lastEvaluatedId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+    post:
+      description: Create a new transmission in the DB using a new audio file.
+      tags:
+        - Song Management API
+      summary: Create new Transmission
+      requestBody:
+        description: Data relating to the new Transmission.
+        required: true
+        content:
+          multipart/formdata:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the new Transmission.
+                  example: "whoisthere"
+                audio:
+                  type: string
+                  format: binary
+                  description: The audio file of the Transmission. This will automatially be split into stems.
+      responses:
+        "200":
+          description: The newly created Transmission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transmission"
+        "400":
+          description: Missing required params or malformed request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "404":
+          description: No transmission with the specified ID found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "409":
+          description: A Transmission with the specified ID already exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlreadyExistsError"
+components:
+  schemas:
+    Transmission:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: nanoId
+          example: fMW0PcHRJGUtUnadq4mvy
+        name:
+          type: string
+          example: "loosestars"
+      description: |
+        A general transmission on emptystream. This is a looping sound consisting of four individual channels, split into:
+        * Bass
+        * Drums
+        * Vocals
+        * Everything Else
+    TransmissionChannel:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          format: nanoId
+          example: fMW0PcHRJGUtUnadq4mvy
+        type:
+          type: string
+          enum:
+            - bass
+            - drums
+            - other
+            - vocals
+      description: A single channel from some parent transmission. This is one of a handful of possible stems from a split source track.
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Item not found."
+      description: A 404 error message.
+    BadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Bad request."
+      description: A 400 error message.
+    AlreadyExistsError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Item already exists."
+      description: A 409 error message.
+    GenericError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Unknown error"
+      description: An error message.
+servers:
+  - url: http://localhost:30330
+    description: The local serverless offline deployment

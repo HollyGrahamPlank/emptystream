@@ -8,3 +8,42 @@ exampleEndpoint:
     - httpApi:
         path: /example
         method: get
+
+#
+#   Song Management Endpoints
+#
+
+transmissionCreate:
+  handler: src/handlers/song-management/transmission/create.handler
+  events:
+    - httpApi:
+        path: /transmission
+        method: post
+
+transmissionList:
+  handler: src/handlers/song-management/transmission/list.handler
+  events:
+    - httpApi:
+        path: /transmission
+        method: get
+
+transmissionRead:
+  handler: src/handlers/song-management/transmission/read.handler
+  events:
+    - httpApi:
+        path: /transmission/{id}
+        method: get
+
+transmissionUpdate:
+  handler: src/handlers/song-management/transmission/update.handler
+  events:
+    - httpApi:
+        path: /transmission/{id}
+        method: patch
+
+transmissionDelete:
+  handler: src/handlers/song-management/transmission/delete.handler
+  events:
+    - httpApi:
+        path: /transmission/{id}
+        method: delete

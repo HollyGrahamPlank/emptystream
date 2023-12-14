@@ -1,11 +1,11 @@
 service: emptystream
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 plugins:
-- serverless-s3-local
-- serverless-plugin-typescript
-- serverless-offline
-- serverless-prune-plugin
+  - serverless-s3-local
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-prune-plugin
 
 custom:
   serverless-offline:
@@ -19,10 +19,13 @@ provider:
   deploymentMethod: direct
   environment:
     SLS_STAGE: ${sls:stage}
-    S3_BUCKET_EXAMPLE: ${sls:stage}-example-bucket
+    SERVICE_NAME: ${self:service}
+    OFFLINE_S3_HOST: "localhost"
+    OFFLINE_S3_PORT: "4569"
+    OFFLINE_S3_PATH: ""
+    OFFLINE_S3_PROTOCOL: "http:"
 
-functions:
-  ${file(serverless-functions.yml)}
+functions: ${file(serverless-functions.yml)}
 
 resources:
   - ${file(serverless-resources.yml)}

@@ -12,6 +12,7 @@
   "homepage": "https://github.com/HollyGrahamPlank/emptystream#readme",
   "scripts": {
     "dev": "serverless offline",
+    "debug": "export SLS_DEBUG=* && node --inspect /usr/local/bin/serverless offline",
     "setup:dynamodb": "ts-node-esm dynamodb-local/create-tables.ts",
     "up": "docker compose -f dynamodb-local/docker-compose.yml up -d",
     "down": "docker compose -f dynamodb-local/docker-compose.yml down",
@@ -22,9 +23,14 @@
     "prune:prod": "serverless prune -n 3 --stage prod",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "task:transmissionSplitter:main": "ts-node-esm src/fargateTasks/transmissionSplitter/main.ts",
+    "task:transmissionSplitter:build": "docker build -t emptystream/transmission-splitter:latest -f ./src/fargateTasks/transmissionSplitter/Dockerfile .",
+    "task:transmissionSplitter:start": "docker run --rm -i -e SLS_STAGE=dev -e SERVICE_NAME=emptystream -e ID=\"0neGf4qkxkc-G-y-9GiPE\" -e IS_OFFLINE=true -e AWS_REGION=us-east-1 -e OFFLINE_S3_HOST=host.docker.internal --name=splitter --add-host host.docker.internal:host-gateway emptystream/transmission-splitter:latest \"npm run task:transmissionSplitter:main\""
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/busboy": "^1.5.3",
     "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
     "@typescript-eslint/parser": "^6.1.0",
@@ -54,8 +60,12 @@
     "@aws-sdk/client-dynamodb": "^3.370.0",
     "@aws-sdk/client-s3": "^3.32.0",
     "@serverless/utils": "^6.13.1",
-    "@types/aws-lambda": "^8.10.119",
+    "aws-sdk": "^2.1421.0",
+    "busboy": "^1.6.0",
+    "electrodb": "^2.7.2",
     "js-yaml": "^4.1.0",
-    "uuid": "^9.0.0"
+    "nanoid": "^5.0.4",
+    "uuid": "^9.0.0",
+    "zod": "^3.21.4"
   }
 }

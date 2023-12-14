@@ -6,4 +6,46 @@ Resources:
   BucketExample:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ${self:provider.environment.S3_BUCKET_EXAMPLE}
+      BucketName: ${sls:stage}-example-bucket
+  BucketMain:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${sls:stage}-${self:service}-mainBucket
+
+  #
+  #   DynamoDB Tables
+  #
+
+  TableMain:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${sls:stage}-${self:service}-mainTable
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+        - AttributeName: pk_gsi1
+          AttributeType: S
+        - AttributeName: sk_gsi1
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: pk_gsi1-sk_gsi1-index
+          KeySchema:
+            - AttributeName: pk_gsi1
+              KeyType: HASH
+            - AttributeName: sk_gsi1
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1

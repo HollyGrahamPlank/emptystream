@@ -15,7 +15,13 @@
  */
 
 import { promises as fs } from "fs";
-import { DynamoDBClient, ListTablesCommand, CreateTableCommand } from "@aws-sdk/client-dynamodb";
+import * as path from "path";
+import {
+  DynamoDBClient,
+  ListTablesCommand,
+  CreateTableCommand,
+  CreateTableCommandInput,
+} from "@aws-sdk/client-dynamodb";
 import * as yaml from "js-yaml";
 
 /**
@@ -47,6 +53,27 @@ async function getExistingDynamoDBTables(client: DynamoDBClient) {
 }
 
 /**
+ * Takes the potentially templated name of a DynamoDB table in the serverless config, and resolves
+ * the templates in it so that we can actually USE the table name. This does not scan the serverless
+ * yml for info about how to resolve - it's just hardcoded to handle a few common cases.
+ *
+ * For example - this turns "${sls:stage}-${self:service}-transmissions" into
+ * "dev-emptystream-transmissions".
+ *
+ * @param unresolvedTableName The raw string of a DynamoDB table's name in the
+ *   serverless-resources.yml file.
+ * @param serviceName The name of the application that we are creating tables for.
+ * @returns
+ */
+function resolveServerlessResourceTableName(
+  unresolvedTableName: string,
+  serviceName: string,
+): string {
+  // eslint-disable-next-line no-template-curly-in-string
+  return unresolvedTableName.replace("${sls:stage}", "dev").replace("${self:service}", serviceName);
+}
+
+/**
  * Create any non-existing DynamoDB tables provided by the SLS config, using the provided DynamoDB
  * client.
  *
@@ -54,6 +81,7 @@ async function getExistingDynamoDBTables(client: DynamoDBClient) {
  * @param client
  */
 async function createLocalDynamoDBTables(
+  serviceName: string,
   serverlessResourcesConfigPath: string,
   client: DynamoDBClient,
 ) {
@@ -74,24 +102,36 @@ async function createLocalDynamoDBTables(
         KeySchema,
         GlobalSecondaryIndexes,
         LocalSecondaryIndexes,
+        ProvisionedThroughput,
       } = definition.Properties;
 
+      const resolvedTableName: string = resolveServerlessResourceTableName(TableName, serviceName);
+      console.info(`${logicalId}: DynamoDB Local - Creating: ${resolvedTableName} ...`);
+
       // If this table already exists, skip it.
-      if (existingTables.find((table) => table === TableName)) return;
+      if (existingTables.find((table) => table === resolvedTableName)) {
+        console.info("\tOK - ALREADY EXISTS");
+        return;
+      }
 
       // OTHERWISE... create a new emulated table based on it's definition.
-      const createCommand = new CreateTableCommand({
+      const createTableConfig: CreateTableCommandInput = {
         AttributeDefinitions,
-        BillingMode,
         KeySchema,
+        TableName: resolvedTableName,
+        BillingMode,
         LocalSecondaryIndexes,
         GlobalSecondaryIndexes,
-        TableName,
-      });
-      await client.send(createCommand);
+        ProvisionedThroughput,
+      };
 
-      // Once we have created the table, tell us about it!
-      console.info(`${logicalId}: DynamoDB Local - Created table: ${TableName}`);
+      try {
+        const createCommand = new CreateTableCommand(createTableConfig);
+        await client.send(createCommand);
+        console.info("\tOK");
+      } catch (e) {
+        console.error(`\tERR: ${e}`);
+      }
     }),
   );
 }
@@ -101,18 +141,22 @@ async function createLocalDynamoDBTables(
 //
 
 // Where the serverless.yml file is store relative to this file.
-const resourcesPath = `${process.cwd()}\\serverless-resources.yml`;
+const resourcesPath = path.join(process.cwd(), "serverless-resources.yml");
 
 // A client to connect to our emulated DynamoDB instance.
 const fakeDBClient = new DynamoDBClient({
+  region: "local",
+  credentials: {
+    accessKeyId: "XXXXXXXXXXXXXXX",
+    secretAccessKey: "XXXXXXXXXXXXXXXXXXXXXX",
+  },
   endpoint: {
     hostname: "localhost",
     port: 30333,
     path: "",
     protocol: "http:",
   },
-  region: "local",
 });
 
 // Create the local DynamoDB tables!
-await createLocalDynamoDBTables(resourcesPath, fakeDBClient);
+await createLocalDynamoDBTables("emptystream", resourcesPath, fakeDBClient);
