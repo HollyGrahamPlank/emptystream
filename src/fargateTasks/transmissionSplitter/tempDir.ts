@@ -1,8 +1,8 @@
 import { promises as fsPromise } from "fs";
 import * as path from "path";
 
-export async function ensurePathExists(path: string) {
-  await fsPromise.mkdir(path, { recursive: true });
+export async function ensurePathExists(pathToCheck: string) {
+  await fsPromise.mkdir(pathToCheck, { recursive: true });
 }
 
 export function getTempDirPath(transmissionId: string): string {

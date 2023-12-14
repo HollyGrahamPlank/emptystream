@@ -1,8 +1,8 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getSplitAudioDir } from "./tempDir.js";
-import { promises as fsPromise } from "fs";
 import * as fs from "fs";
+import { promises as fsPromise } from "fs";
 import * as path from "path";
+import { getSplitAudioDir } from "./tempDir.js";
 
 //
 //  Local Functions
@@ -16,11 +16,9 @@ function createS3Client(): S3Client {
   return new S3Client({});
 }
 
-async function putFileInS3(bucketName: string, fileKey: string, fileStream: ReadableStream) {
+function putFileInS3(bucketName: string, fileKey: string, fileStream: ReadableStream) {
   const client = createS3Client();
-  return await client.send(
-    new PutObjectCommand({ Bucket: bucketName, Key: fileKey, Body: fileStream }),
-  );
+  return client.send(new PutObjectCommand({ Bucket: bucketName, Key: fileKey, Body: fileStream }));
 }
 
 //

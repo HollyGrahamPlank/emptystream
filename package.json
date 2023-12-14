@@ -23,7 +23,10 @@
     "prune:prod": "serverless prune -n 3 --stage prod",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "task:transmissionSplitter:main": "ts-node-esm src/fargateTasks/transmissionSplitter/main.ts",
+    "task:transmissionSplitter:build": "docker build -t emptystream/transmission-splitter:latest -f ./src/fargateTasks/transmissionSplitter/Dockerfile .",
+    "task:transmissionSplitter:start": "docker run --rm -i --name=splitter emptystream/transmission-splitter:latest \"npm run task:transmissionSplitter:main\""
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.119",

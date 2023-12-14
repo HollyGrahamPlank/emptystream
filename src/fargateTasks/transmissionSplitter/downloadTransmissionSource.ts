@@ -23,9 +23,9 @@ function createS3Client(): S3Client {
  * @param fileKey The full path of the file that we want to get.
  * @returns Information about the file including the file's body
  */
-async function getFileFromS3(bucketName: string, fileKey: string) {
+function getFileFromS3(bucketName: string, fileKey: string) {
   const client = createS3Client();
-  return await client.send(new GetObjectCommand({ Bucket: bucketName, Key: fileKey }));
+  return client.send(new GetObjectCommand({ Bucket: bucketName, Key: fileKey }));
 }
 
 /**

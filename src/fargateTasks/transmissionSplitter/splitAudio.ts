@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
-import { ensurePathExists, getSourceAudioDir, getSplitAudioDir } from "./tempDir.js";
 import { promises as fsPromise } from "fs";
 import * as path from "path";
+import { ensurePathExists, getSourceAudioDir, getSplitAudioDir } from "./tempDir.js";
 
 //
 //  Functions
@@ -26,9 +26,9 @@ function runCommand(executablePath: string, args: string[], onDataCallback?: (ch
     if (onDataCallback) spawnedProcess.stdout.on("data", (chunk) => onDataCallback(chunk));
 
     // Once the process exits...
-    spawnedProcess.on("exit", (code, signal) => {
+    spawnedProcess.on("exit", (code) => {
       // If there was a non-standard exit, REJECT
-      if (code != 0) {
+      if (code !== 0) {
         reject(new Error(`Non-zero exit code (${code})`));
       }
       // If the process exited normally... RESOLVE
@@ -79,8 +79,6 @@ export default async function splitAudio(id: string) {
         );
       }),
     );
-  } catch (exception) {
-    throw exception;
   } finally {
     // Regardless of success or fail - clean up the folder that demucs may have created
     await fsPromise.rm(pathToCurrentSplitDir, { recursive: true, force: true });
