@@ -27,6 +27,12 @@ async function putFileInS3(bucketName: string, fileKey: string, fileStream: Read
 //  Exports
 //
 
+/**
+ * Uploads each split found in the temporary working directory to S3, as transmission channels.
+ *
+ * @param bucketName The name of the S3 bucket to upload to
+ * @param id The ID of the emptystream Transmission that we are uploading channels to.
+ */
 export default async function uploadTransmissionChannel(bucketName: string, id: string) {
   // For each split that exists...
   const pathToSplits = getSplitAudioDir(id);
