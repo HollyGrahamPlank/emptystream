@@ -12,10 +12,10 @@ function createS3Client(): S3Client {
       secretAccessKey: "S3RVER",
     },
     endpoint: {
-      hostname: "localhost",
-      port: 4569,
-      path: "",
-      protocol: "http:",
+      hostname: process.env.OFFLINE_S3_HOST || "localhost",
+      port: parseInt(process.env.OFFLINE_S3_PORT || "4569", 10),
+      path: process.env.OFFLINE_S3_PATH || "",
+      protocol: process.env.OFFLINE_S3_PROTOCOL || "http:",
     },
   });
 }

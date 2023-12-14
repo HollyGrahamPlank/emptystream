@@ -20,6 +20,10 @@ provider:
   environment:
     SLS_STAGE: ${sls:stage}
     SERVICE_NAME: ${self:service}
+    OFFLINE_S3_HOST: "localhost"
+    OFFLINE_S3_PORT: "4569"
+    OFFLINE_S3_PATH: ""
+    OFFLINE_S3_PROTOCOL: "http:"
 
 functions: ${file(serverless-functions.yml)}
 

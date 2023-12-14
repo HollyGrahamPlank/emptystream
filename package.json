@@ -26,7 +26,7 @@
     "prepare": "husky install",
     "task:transmissionSplitter:main": "ts-node-esm src/fargateTasks/transmissionSplitter/main.ts",
     "task:transmissionSplitter:build": "docker build -t emptystream/transmission-splitter:latest -f ./src/fargateTasks/transmissionSplitter/Dockerfile .",
-    "task:transmissionSplitter:start": "docker run --rm -i --name=splitter emptystream/transmission-splitter:latest \"npm run task:transmissionSplitter:main\""
+    "task:transmissionSplitter:start": "docker run --rm -i -e SLS_STAGE=dev -e SERVICE_NAME=emptystream -e ID=test -e IS_OFFLINE=true -e AWS_REGION=us-east-1 -e OFFLINE_S3_HOST=host.docker.internal --name=splitter --add-host host.docker.internal:host-gateway emptystream/transmission-splitter:latest \"npm run task:transmissionSplitter:main\""
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.119",
