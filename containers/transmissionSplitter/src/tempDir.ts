@@ -16,3 +16,7 @@ export function getSourceAudioDir(transmissionId: string): string {
 export function getSplitAudioDir(transmissionId: string): string {
   return path.join(getTempDirPath(transmissionId), "split");
 }
+
+export async function cleanupTemporaryWorkingDir(transmissionId: string) {
+  await fsPromise.rm(getTempDirPath(transmissionId), { recursive: true, force: true });
+}

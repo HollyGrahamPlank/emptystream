@@ -51,34 +51,38 @@ function runCommand(executablePath: string, args: string[], onDataCallback?: (ch
  *   the temporary directory.
  */
 export default async function splitAudio(id: string) {
-  // Tell demucs to split our audio.
-  await runCommand(
-    "python",
-    ["-u", "-m", "demucs", `"${path.join(getSourceAudioDir(id), id)}"`],
-    (chunk) => {
-      console.log(chunk);
-    },
-  );
-
-  // Make sure we have a spot to store the split audio
-  const whereToPutSplitAudio = getSplitAudioDir(id);
-  await ensurePathExists(whereToPutSplitAudio);
-
-  // Where demucs spat out our split audio
+  // Where demucs will spit out our split audio
   const pathToCurrentSplitDir = path.join("split", "htdemucs", id);
 
-  // Loop through all stems that demucs spat out, in parallel...
-  const newStems: string[] = await fsPromise.readdir(pathToCurrentSplitDir);
-  await Promise.all(
-    newStems.map(async (stemName) => {
-      // ... and copy the stem to the temp working dir
-      await fsPromise.rename(
-        path.join(pathToCurrentSplitDir, stemName), // The old file path
-        path.join(whereToPutSplitAudio, stemName), // The new file path
-      );
-    }),
-  );
+  try {
+    // Tell demucs to split our audio.
+    await runCommand(
+      "python",
+      ["-u", "-m", "demucs", `"${path.join(getSourceAudioDir(id), id)}"`],
+      (chunk) => {
+        console.log(chunk);
+      },
+    );
 
-  // Clean up the folder that demucs created
-  await fsPromise.rmdir(pathToCurrentSplitDir);
+    // Make sure we have a spot to store the split audio
+    const whereToPutSplitAudio = getSplitAudioDir(id);
+    await ensurePathExists(whereToPutSplitAudio);
+
+    // Loop through all stems that demucs spat out, in parallel...
+    const newStems: string[] = await fsPromise.readdir(pathToCurrentSplitDir);
+    await Promise.all(
+      newStems.map(async (stemName) => {
+        // ... and copy the stem to the temp working dir
+        await fsPromise.rename(
+          path.join(pathToCurrentSplitDir, stemName), // The old file path
+          path.join(whereToPutSplitAudio, stemName), // The new file path
+        );
+      }),
+    );
+  } catch (exception) {
+    throw exception;
+  } finally {
+    // Regardless of success or fail - clean up the folder that demucs may have created
+    await fsPromise.rm(pathToCurrentSplitDir, { recursive: true, force: true });
+  }
 }
